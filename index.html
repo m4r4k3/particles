@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin:0 ;
+            padding:0 ;
+            box-sizing: border-box;
+        }
+        canvas{
+            overflow: hidden;
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+    <canvas></canvas>
+   <script>
+    const canvas = document.querySelector("canvas")
+    const ctx = canvas.getContext("2d")
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+
+    function line(x1 , x2 , y1 , y2){
+        ctx.beginPath()
+        ctx.strokeStyle = 1
+        ctx.strokeStyle ="white"
+        ctx.moveTo(x1 , y1)
+        ctx.lineTo(x2 , y2)
+        ctx.stroke()
+        ctx.closePath()
+    }
+    class particle {
+        constructor(){
+            this.cr = 50
+            this.x = Math.floor(Math.random() * canvas.width +1  )
+            this.y = Math.floor(Math.random() * canvas.height +1 )
+            this.speed = 0.1
+        }
+        draw(){
+            ctx.beginPath()
+            ctx.fillStyle = "white"
+            ctx.arc(this.x , this.y , 3 , 0 , Math.PI *2)
+            ctx.fill()
+            ctx.closePath()
+        }
+        update(){
+            let randomNum = Math.floor(this.speed * Math.random() +1)
+            this.x = Math.round(Math.random()) ? this.x +randomNum:this.x>canvas.width || this.x<0? Math.floor(Math.random() * canvas.width +1  ): this.x - randomNum
+            this.y = Math.round(Math.random()) ? this.y +randomNum:this.y>canvas.height || this.y<0? Math.floor(Math.random() * canvas.height +1  ) : this.y -randomNum
+       
+        }
+        moveAway(mx , my){
+            this.x = this.x <mx ?this.x - (  this.cr- (mx-this.x)) : this.x + (this.cr-( mx-this.x)) 
+            this.y = this.y <mx ?this.y - (this.cr- (mx-this.y)) : this.y+ (this.cr-( mx-this.y)) 
+        }
+    }
+    const particles = []
+    for(i= 0 ; i<3000 ; i++)
+    {
+        particles.push(new particle)
+    }
+  setInterval(()=>{
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(e=>{
+            e.update()
+            e.draw()
+            particles.forEach(
+                e1=>{
+                    if(Math.sqrt((e.x - e1.x)**2 + (e.y - e1.y)**2)<30 && e.x+e.y != e1.x+e1.y)
+                    {
+                        line(e.x , e1.x , e.y , e1.y)
+                    }
+                }
+            ) 
+        })
+    } , 60
+)
+canvas.addEventListener("mousemove" , (e)=>{
+    const mx = e.clientX ;
+    const my = e.clientY ;
+    console.log("check")
+    particles.forEach(e=>{
+        if(Math.sqrt((e.x - mx)**2 + (e.y - my) **2) <50){
+            e.moveAway(mx , my)
+        }
+    })
+})
+   </script> 
+</body>
+</html>
